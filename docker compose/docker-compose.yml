@@ -28,7 +28,10 @@ services:
       - "8200:8200"
     restart: always
     volumes:
-      - ./data:/vault/data/:rw
+      - vault-data:/vault/data/:rw
     cap_add:
       - IPC_LOCK
     command: ["server"]
+
+volumes:
+  vault-data:
