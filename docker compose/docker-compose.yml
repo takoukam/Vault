@@ -1,10 +1,10 @@
-version: '1.0'
+version: '3.8'
 services:
   vault:
-    image: hashicorp/vault:latest
+    image: vault:1.13.3
     container_name: vault
     ports:
-      - "8200:8200" # Expose le port 8200 pour accéder à Vault
+      - "8200:8200" 
     environment:
       VAULT_ADDR: http://0.0.0.0:8200
       VAULT_API_ADDR: http://localhost:8200
@@ -25,9 +25,10 @@ services:
           "max_lease_ttl": "24h",
           "ui": true
         }
+        
     volumes:
-      - ./vault/data:/vault/data # Stockage persistant des données Vault
-    cap_add:
-      - IPC_LOCK # Nécessaire pour Vault
+      - ./vault/data:/vault/data 
+    cap_add:  
+      - IPC_LOCK 
     command: ["server"]
     restart: unless-stopped
