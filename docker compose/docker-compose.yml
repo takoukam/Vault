@@ -1,33 +1,24 @@
-version: '1.0'
+name: vault
 services:
   vault:
-    image: hashicorp/vault:latest
+    image: hashicorp/vault
     container_name: vault
-    ports:
-      - "8200:8200" # Expose le port 8200 pour accéder à Vault
     environment:
-      VAULT_ADDR: http://0.0.0.0:8200
-      VAULT_API_ADDR: http://localhost:8200
-      VAULT_LOCAL_CONFIG: |
-        {
-          "backend": {
-            "file": {
-              "path": "/vault/data"
-            }
-          },
-          "listener": [{
-            "tcp": {
-              "address": "0.0.0.0:8200",
-              "tls_disable": true
-            }
-          }],
-          "default_lease_ttl": "1h",
-          "max_lease_ttl": "24h",
-          "ui": true
-        }
+      VAULT_ADDR: "https://localhost:8200"
+      VAULT_API_ADDR: "https://localhost:8200"
+      VAULT_ADDRESS: "https://localhost:8200"
+      # VAULT_UI: true
+      # VAULT_TOKEN:
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    restart: always
     volumes:
-      - ./vault/data:/vault/data # Stockage persistant des données Vault
+      - ./logs:/vault/logs/:rw
+      - ./data:/vault/data/:rw
+      - ./config:/vault/config/:rw
+      - ./certs:/certs/:rw
+      - ./file:/vault/file/:rw
     cap_add:
-      - IPC_LOCK # Nécessaire pour Vault
-    command: ["server"]
-    restart: unless-stopped
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/config.hcl
