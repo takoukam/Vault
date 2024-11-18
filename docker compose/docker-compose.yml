@@ -7,18 +7,28 @@ services:
       VAULT_ADDR: "https://localhost:8200"
       VAULT_API_ADDR: "https://localhost:8200"
       VAULT_ADDRESS: "https://localhost:8200"
-      # VAULT_UI: true
-      # VAULT_TOKEN:
+      VAULT_LOCAL_CONFIG: |
+        {
+          "backend": {
+            "file": {
+              "path": "/vault/data"
+            }
+          },
+          "listener": [{
+            "tcp": {
+              "address": "0.0.0.0:8200",
+              "tls_disable": true
+            }
+          }],
+          "default_lease_ttl": "1h",
+          "max_lease_ttl": "24h",
+          "ui": true
+        }
     ports:
       - "8200:8200"
-      - "8201:8201"
     restart: always
     volumes:
-      - ./logs:/vault/logs/:rw
       - ./data:/vault/data/:rw
-      - ./config:/vault/config/:rw
-      - ./certs:/certs/:rw
-      - ./file:/vault/file/:rw
     cap_add:
       - IPC_LOCK
-    entrypoint: vault server -config /vault/config/config.hcl
+    command: ["server"]
