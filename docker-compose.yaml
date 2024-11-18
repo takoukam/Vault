@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+    ports:
+      - "8200:8200" 
+    environment:
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_API_ADDR: http://localhost:8200
+      VAULT_LOCAL_CONFIG: |
+        {
+          "backend": {
+            "file": {
+              "path": "/vault/data"
+            }
+          },
+          "listener": [{
+            "tcp": {
+              "address": "0.0.0.0:8200",
+              "tls_disable": true
+            }
+          }],
+          "default_lease_ttl": "1h",
+          "max_lease_ttl": "24h",
+          "ui": true
+        }
+    volumes:
+      - ./vault/data:/vault/data # Stockage persistant des données Vault
+    cap_add:
+      - IPC_LOCK # Nécessaire pour Vault
+    command: ["server"]
+    restart: unless-stopped
